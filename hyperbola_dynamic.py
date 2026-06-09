@@ -129,9 +129,9 @@ ax.set_aspect('equal')
 # 焦点（蓝色圆点，大小减半）
 ax.plot(F1[0], F1[1], 'bo', markersize=5)
 ax.plot(F2[0], F2[1], 'bo', markersize=5)
-# 焦点标注：增加偏移量避免遮挡
-ax.text(F1[0] - 0.8, F1[1] - 2.2, r"$F_1$", color='blue', fontsize=10, ha='center', weight='bold')
-ax.text(F2[0] + 0.8, F2[1] - 2.2, r"$F_2$", color='blue', fontsize=10, ha='center', weight='bold')
+# 焦点标注：大幅增加偏移量，确保远离圆点
+ax.text(F1[0] - 1.2, F1[1] - 2.5, r"$F_1$", color='blue', fontsize=10, ha='center', weight='bold')
+ax.text(F2[0] + 1.2, F2[1] - 2.5, r"$F_2$", color='blue', fontsize=10, ha='center', weight='bold')
 
 if valid:
     # 已绘制部分：右支实线，左支虚线
@@ -168,8 +168,8 @@ if valid:
         ax.text(P[0]+0.3, P[1]+0.3, "P", color='green', fontsize=10, weight='bold')
         ax.plot([P[0], F1[0]], [P[1], F1[1]], 'g--', linewidth=1.5, alpha=0.8)
         ax.plot([P[0], F2[0]], [P[1], F2[1]], 'g--', linewidth=1.5, alpha=0.8)
-        # 距离差文本框移至 P 点右上侧，避免遮挡
-        ax.text(P[0] + 1.2, P[1] + 1.0, r"$|PF_1-PF_2| = {:.2f}$ km".format(actual_diff),
+        # 距离差文本框移至 P 点右上方更远处，避免遮挡
+        ax.text(P[0] + 1.8, P[1] + 1.5, r"$|PF_1-PF_2| = {:.2f}$ km".format(actual_diff),
                 color='green', fontsize=9, ha='left',
                 bbox=dict(boxstyle='round', facecolor='white', alpha=0.7))
     
