@@ -127,8 +127,8 @@ ax.grid(True, alpha=0.3)
 ax.set_aspect('equal')
 
 # 焦点（蓝色圆点）
-ax.plot(F1[0], F1[1], 'bo', markersize=10)
-ax.plot(F2[0], F2[1], 'bo', markersize=10)
+ax.plot(F1[0], F1[1], 'bo', markersize=5)
+ax.plot(F2[0], F2[1], 'bo', markersize=5)
 # 焦点标注：左焦点文字偏左下方，右焦点文字偏右下方，避免被圆点遮挡
 ax.text(F1[0] - 0.5, F1[1] - 1.8, r"$F_1$", color='blue', fontsize=12, ha='center', weight='bold')
 ax.text(F2[0] + 0.5, F2[1] - 1.8, r"$F_2$", color='blue', fontsize=12, ha='center', weight='bold')
