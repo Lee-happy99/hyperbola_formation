@@ -126,12 +126,12 @@ ax.set_ylabel("y (km)")
 ax.grid(True, alpha=0.3)
 ax.set_aspect('equal')
 
-# 焦点（蓝色圆点）
+# 焦点（蓝色圆点，大小减半）
 ax.plot(F1[0], F1[1], 'bo', markersize=5)
 ax.plot(F2[0], F2[1], 'bo', markersize=5)
-# 焦点标注：左焦点文字偏左下方，右焦点文字偏右下方，避免被圆点遮挡
-ax.text(F1[0] - 0.5, F1[1] - 1.8, r"$F_1$", color='blue', fontsize=12, ha='center', weight='bold')
-ax.text(F2[0] + 0.5, F2[1] - 1.8, r"$F_2$", color='blue', fontsize=12, ha='center', weight='bold')
+# 焦点标注：增加偏移量避免遮挡
+ax.text(F1[0] - 0.8, F1[1] - 2.2, r"$F_1$", color='blue', fontsize=10, ha='center', weight='bold')
+ax.text(F2[0] + 0.8, F2[1] - 2.2, r"$F_2$", color='blue', fontsize=10, ha='center', weight='bold')
 
 if valid:
     # 已绘制部分：右支实线，左支虚线
@@ -162,14 +162,15 @@ if valid:
         ax.plot(v_left[0], v_left[1], 'ko', markersize=4)
         ax.plot(center[0], center[1], 'k+', markersize=8, mew=1.5)
     
-    # 动点 P
+    # 动点 P（绿色，稍大一点以突出）
     if P is not None:
-        ax.plot(P[0], P[1], 'go', markersize=10, label='动点 P')
-        ax.text(P[0]+0.3, P[1]+0.3, "P", color='green', fontsize=12, weight='bold')
+        ax.plot(P[0], P[1], 'go', markersize=6, label='动点 P')
+        ax.text(P[0]+0.3, P[1]+0.3, "P", color='green', fontsize=10, weight='bold')
         ax.plot([P[0], F1[0]], [P[1], F1[1]], 'g--', linewidth=1.5, alpha=0.8)
         ax.plot([P[0], F2[0]], [P[1], F2[1]], 'g--', linewidth=1.5, alpha=0.8)
-        ax.text(P[0], P[1]-1.2, r"$|PF_1-PF_2| = {:.2f}$ km".format(actual_diff),
-                color='green', fontsize=9, ha='center',
+        # 距离差文本框移至 P 点右上侧，避免遮挡
+        ax.text(P[0] + 1.2, P[1] + 1.0, r"$|PF_1-PF_2| = {:.2f}$ km".format(actual_diff),
+                color='green', fontsize=9, ha='left',
                 bbox=dict(boxstyle='round', facecolor='white', alpha=0.7))
     
     # 参数信息框
@@ -179,7 +180,7 @@ if valid:
 else:
     ax.text(0.1, 0.5, "参数不合理：距离差 ≥ 两焦点距离，无法形成双曲线", transform=ax.transAxes, color='red')
 
-ax.legend(loc='upper right')
+ax.legend(loc='upper right', fontsize=8)
 st.pyplot(fig, use_container_width=True)
 
 with st.expander("📖 双曲线几何定义与 TDOA 原理衔接（点击展开）"):
