@@ -173,8 +173,8 @@ if valid:
                 color='green', fontsize=9, ha='left',
                 bbox=dict(boxstyle='round', facecolor='white', alpha=0.7))
     
-    # 参数信息框
-    info_text = f"距离差常数 = {distance_diff:.2f} km\n半实轴 a = {a:.2f}\n半焦距 c = {c:.2f}\n半虚轴 b = {b:.2f}"
+    # 参数信息框（左上角，仅显示距离差常数和半实轴 a）
+    info_text = f"距离差常数 = {distance_diff:.2f} km\n半实轴 a = {a:.2f}"
     ax.text(0.05, 0.95, info_text, transform=ax.transAxes, fontsize=9,
             verticalalignment='top', bbox=dict(boxstyle='round', facecolor='wheat', alpha=0.8))
 else:
