@@ -65,11 +65,11 @@ if valid:
     b = np.sqrt(c**2 - a**2)
     t_max = 3.0
     t_vals = np.linspace(-t_max, t_max, 400)
-    # 右支 (x = a*cosh(t), y = b*sinh(t))
+    # 右支
     x_right = a * np.cosh(t_vals)
     y_right = b * np.sinh(t_vals)
     right_branch = std_to_world(np.vstack((x_right, y_right)).T)
-    # 左支 (x = -a*cosh(t), y = b*sinh(t))
+    # 左支
     x_left = -a * np.cosh(t_vals)
     y_left = b * np.sinh(t_vals)
     left_branch = std_to_world(np.vstack((x_left, y_left)).T)
@@ -126,20 +126,21 @@ ax.set_ylabel("y (km)")
 ax.grid(True, alpha=0.3)
 ax.set_aspect('equal')
 
-# 焦点
+# 焦点（蓝色圆点）
 ax.plot(F1[0], F1[1], 'bo', markersize=10)
 ax.plot(F2[0], F2[1], 'bo', markersize=10)
-ax.text(F1[0], F1[1]-1.2, r"$F_1$", color='blue', fontsize=12, ha='center', weight='bold')
-ax.text(F2[0], F2[1]-1.2, r"$F_2$", color='blue', fontsize=12, ha='center', weight='bold')
+# 焦点标注：左焦点文字偏左下方，右焦点文字偏右下方，避免被圆点遮挡
+ax.text(F1[0] - 0.5, F1[1] - 1.8, r"$F_1$", color='blue', fontsize=12, ha='center', weight='bold')
+ax.text(F2[0] + 0.5, F2[1] - 1.8, r"$F_2$", color='blue', fontsize=12, ha='center', weight='bold')
 
 if valid:
-    # ---- 已绘制部分：右支实线，左支虚线 ----
+    # 已绘制部分：右支实线，左支虚线
     if len(right_part) > 0:
         ax.plot(right_part[:,0], right_part[:,1], 'r-', linewidth=2, label='双曲线 (右支, 实线)')
     if len(left_part) > 0:
         ax.plot(left_part[:,0], left_part[:,1], 'r--', linewidth=2, label='双曲线 (左支, 虚线)')
     
-    # ---- 未绘制部分（灰色虚线） ----
+    # 未绘制部分（灰色虚线）
     if progress < 1.0:
         if len(right_branch) > 0:
             ax.plot(right_branch[:,0], right_branch[:,1], 'gray', linewidth=1, alpha=0.3, linestyle='--')
