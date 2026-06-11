@@ -132,8 +132,8 @@ ax.grid(True, alpha=0.3)
 ax.set_aspect('equal')
 
 # 焦点（蓝色圆点，尺寸减小为5，文字偏移增大）
-ax.plot(F1[0], F1[1], 'bo', markersize=5)
-ax.plot(F2[0], F2[1], 'bo', markersize=5)
+ax.plot(F1[0], F1[1], 'bo', markersize=3)
+ax.plot(F2[0], F2[1], 'bo', markersize=3)
 ax.text(F1[0] - 2.0, F1[1] - 1.8, "站1 F1", color='blue', fontsize=11, ha='center', weight='bold')
 ax.text(F2[0] + 2.0, F2[1] - 1.8, "站2 F2", color='blue', fontsize=11, ha='center', weight='bold')
 
@@ -160,20 +160,20 @@ if valid:
         end1 = center + perp * b
         end2 = center - perp * b
         ax.plot([end1[0], end2[0]], [end1[1], end2[1]], 'k--', linewidth=1.2, alpha=0.7, label='虚轴')
-        ax.plot(v_right[0], v_right[1], 'ko', markersize=4)
-        ax.plot(v_left[0], v_left[1], 'ko', markersize=4)
-        ax.plot(center[0], center[1], 'k+', markersize=8, mew=1.5)
+        ax.plot(v_right[0], v_right[1], 'ko', markersize=3)
+        ax.plot(v_left[0], v_left[1], 'ko', markersize=3)
+        ax.plot(center[0], center[1], 'k+', markersize=3, mew=1.5)
     
     # 动点 P
     if P is not None:
-        ax.plot(P[0], P[1], 'go', markersize=10, label='P目标')
+        ax.plot(P[0], P[1], 'go', markersize=3, label='P目标')
         ax.text(P[0] - 1.5, P[1] + 1.5, "P目标", color='green', fontsize=12, weight='bold',
                 bbox=dict(boxstyle='round,pad=0.2', facecolor='white', edgecolor='none', alpha=0.9))
         ax.plot([P[0], F1[0]], [P[1], F1[1]], 'g--', linewidth=1.5, alpha=0.8)
         ax.plot([P[0], F2[0]], [P[1], F2[1]], 'g--', linewidth=1.5, alpha=0.8)
-        ax.text(P[0], P[1] - 1.2, f"|PF1-PF2| = {actual_diff:.2f} km", color='green', fontsize=9,
-                ha='center', bbox=dict(boxstyle='round', facecolor='white', alpha=0.7))
-    
+        """ax.text(P[0], P[1] - 1.2, f"|PF1-PF2| = {actual_diff:.2f} km", color='green', fontsize=9,
+              ha='center', bbox=dict(boxstyle='round', facecolor='white', alpha=0.7))
+    """
     # 参数信息框
     info_text = f"距离差常数 = {distance_diff:.2f} km\n半实轴 a = {a:.2f}\n半焦距 c = {c:.2f}\n半虚轴 b = {b:.2f}"
     ax.text(0.02, 0.5, info_text, transform=ax.transAxes, fontsize=8,
