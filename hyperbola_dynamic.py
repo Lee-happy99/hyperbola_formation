@@ -70,21 +70,24 @@ if valid:
     b = np.sqrt(c**2 - a**2)
     t_max = 3.0
     t_vals = np.linspace(-t_max, t_max, 400)
-    x_right = a * np.cosh(t_vals)
-    y_right = b * np.sinh(t_vals)
-    right_branch = std_to_world(np.vstack((x_right, y_right)).T)
-    x_left = -a * np.cosh(t_vals)
-    y_left = b * np.sinh(t_vals)
-    left_branch = std_to_world(np.vstack((x_left, y_left)).T)
+    # 左支 (t 为负)
+    x_left_std = -a * np.cosh(t_vals)
+    y_left_std = b * np.sinh(t_vals)
+    left_branch = std_to_world(np.vstack((x_left_std, y_left_std)).T)
+    # 右支 (t 为正)
+    x_right_std = a * np.cosh(t_vals)
+    y_right_std = b * np.sinh(t_vals)
+    right_branch = std_to_world(np.vstack((x_right_std, y_right_std)).T)
     
     n = len(t_vals)
     idx = int(n * progress)
-    right_part = right_branch[:idx]
     left_part = left_branch[:idx]
+    right_part = right_branch[:idx]
     
+    # 动点 P 放在左支
     if progress > 0:
         t_curr = t_vals[idx-1] if idx>0 else t_vals[0]
-        p_std = np.array([a * np.cosh(t_curr), b * np.sinh(t_curr)])
+        p_std = np.array([-a * np.cosh(t_curr), b * np.sinh(t_curr)])
         P = std_to_world(p_std.reshape(1,2))[0]
         d1 = np.linalg.norm(P - F1)
         d2 = np.linalg.norm(P - F2)
@@ -94,19 +97,19 @@ if valid:
         actual_diff = None
 else:
     b = None
-    right_branch = left_branch = right_part = left_part = None
+    left_branch = right_branch = left_part = right_part = None
     P = None
 
 # 动态坐标轴范围
 all_x = [x1, x2]
 all_y = [y1, y2]
 if valid:
-    if len(right_branch) > 0:
-        all_x.extend(right_branch[:,0])
-        all_y.extend(right_branch[:,1])
     if len(left_branch) > 0:
         all_x.extend(left_branch[:,0])
         all_y.extend(left_branch[:,1])
+    if len(right_branch) > 0:
+        all_x.extend(right_branch[:,0])
+        all_y.extend(right_branch[:,1])
 if P is not None:
     all_x.append(P[0])
     all_y.append(P[1])
@@ -128,20 +131,18 @@ ax.set_ylabel("y (km)")
 ax.grid(True, alpha=0.3)
 ax.set_aspect('equal')
 
-# 焦点（蓝色圆点），标注使用普通字符串，无LaTeX
-ax.plot(F1[0], F1[1], 'bo', markersize=10)
-ax.plot(F2[0], F2[1], 'bo', markersize=10)
-# 左焦点标注（透明底框，无白色背景）
-ax.text(F1[0] - 1.5, F1[1] - 1.5, "站1 F1", color='blue', fontsize=11, ha='center', weight='bold')
-# 右焦点标注（透明底框）
-ax.text(F2[0] + 1.5, F2[1] - 1.5, "站2 F2", color='blue', fontsize=11, ha='center', weight='bold')
+# 焦点（蓝色圆点，尺寸减小为5，文字偏移增大）
+ax.plot(F1[0], F1[1], 'bo', markersize=5)
+ax.plot(F2[0], F2[1], 'bo', markersize=5)
+ax.text(F1[0] - 2.0, F1[1] - 1.8, "站1 F1", color='blue', fontsize=11, ha='center', weight='bold')
+ax.text(F2[0] + 2.0, F2[1] - 1.8, "站2 F2", color='blue', fontsize=11, ha='center', weight='bold')
 
 if valid:
-    # 双曲线：左支红色虚线，右支红色实线
+    # 双曲线：左支红色实线，右支红色虚线
     if len(left_part) > 0:
-        ax.plot(left_part[:,0], left_part[:,1], 'r--', linewidth=2, label='双曲线 (左支, 虚线)')
+        ax.plot(left_part[:,0], left_part[:,1], 'r-', linewidth=2, label='双曲线 (左支, 实线)')
     if len(right_part) > 0:
-        ax.plot(right_part[:,0], right_part[:,1], 'r-', linewidth=2, label='双曲线 (右支, 实线)')
+        ax.plot(right_part[:,0], right_part[:,1], 'r--', linewidth=2, label='双曲线 (右支, 虚线)')
     
     if progress < 1.0:
         if len(left_branch) > 0:
@@ -163,25 +164,24 @@ if valid:
         ax.plot(v_left[0], v_left[1], 'ko', markersize=4)
         ax.plot(center[0], center[1], 'k+', markersize=8, mew=1.5)
     
-    # 动点 P（绿色），标注“P目标”
+    # 动点 P
     if P is not None:
         ax.plot(P[0], P[1], 'go', markersize=10, label='P目标')
-        ax.text(P[0] + 1.5, P[1] + 1.5, "P目标", color='green', fontsize=12, weight='bold',
+        ax.text(P[0] - 1.5, P[1] + 1.5, "P目标", color='green', fontsize=12, weight='bold',
                 bbox=dict(boxstyle='round,pad=0.2', facecolor='white', edgecolor='none', alpha=0.9))
         ax.plot([P[0], F1[0]], [P[1], F1[1]], 'g--', linewidth=1.5, alpha=0.8)
         ax.plot([P[0], F2[0]], [P[1], F2[1]], 'g--', linewidth=1.5, alpha=0.8)
         ax.text(P[0], P[1] - 1.2, f"|PF1-PF2| = {actual_diff:.2f} km", color='green', fontsize=9,
                 ha='center', bbox=dict(boxstyle='round', facecolor='white', alpha=0.7))
     
-    # 参数信息框：放在左侧，与右侧图例对称，使用白色半透明圆角框
+    # 参数信息框
     info_text = f"距离差常数 = {distance_diff:.2f} km\n半实轴 a = {a:.2f}\n半焦距 c = {c:.2f}\n半虚轴 b = {b:.2f}"
-    ax.text(0.02, 0.5, info_text, transform=ax.transAxes, fontsize=9,
-            verticalalignment='center', bbox=dict(boxstyle='round', facecolor='white', alpha=0.7))
+    ax.text(0.02, 0.5, info_text, transform=ax.transAxes, fontsize=8,
+            verticalalignment='center', bbox=dict(boxstyle='round', pad=0.3, facecolor='white', alpha=0.7))
 else:
     ax.text(0.1, 0.5, "参数不合理：距离差 ≥ 两焦点距离，无法形成双曲线", transform=ax.transAxes, color='red')
 
-# 图例放在右侧中部，同样白色半透明圆角框（默认）
-ax.legend(loc='center right', fontsize=10, framealpha=0.7)
+ax.legend(loc='center right', fontsize=8, framealpha=0.7, handlelength=2, handletextpad=0.5)
 st.pyplot(fig, use_container_width=True)
 
 with st.expander("📖 双曲线几何定义与 TDOA 原理衔接（点击展开）"):
@@ -189,7 +189,7 @@ with st.expander("📖 双曲线几何定义与 TDOA 原理衔接（点击展开
     - **双曲线定义**：平面内到两个定点（焦点）的距离之差的绝对值为常数（$2a$，且 $2a < |F_1F_2|$）的点的轨迹。  
     - **实轴**：连接两顶点的线段，长度 $2a$。  
     - **虚轴**：通过中心垂直于实轴的线段，长度 $2b$，满足 $c^2 = a^2 + b^2$。  
-    - **线型**：左支红色虚线，右支红色实线。  
+    - **线型**：左支红色实线，右支红色虚线。  
     - **TDOA 定位基础**：两个侦察站 $F_1, F_2$ 测得到目标的距离差 $\Delta d = c \cdot \Delta t$ → 目标位于以 $F_1, F_2$ 为焦点的双曲线上。引入第三个站，两条双曲线相交即得目标位置。  
     - **操作提示**：① 调整距离差常数，观察双曲线形状变化；② 拖动“绘制进度”，观察目标点（绿色）移动时虚线长度差始终等于常数；③ 可勾选/取消显示实轴虚轴。
     """)
