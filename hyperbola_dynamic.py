@@ -25,28 +25,28 @@ st.markdown("""
 """, unsafe_allow_html=True)
 
 st.title("📐 双曲线几何定义：到两定点距离差为常数")
-st.markdown("**调整距离差常数 → 双曲线实时变化；拖动绘制进度 → 观察目标满足 |PF₁ - PF₂| = 常数**")
+st.markdown("**调整距离差常数 → 双曲线实时变化；拖动绘制进度 → 观察目标满足 |PF1 - PF2| = 常数**")
 
 # ------------------- 侧边栏参数（绘制进度置顶） -------------------
 st.sidebar.header("🔧 参数设置")
 progress = st.sidebar.slider("绘制进度 (t 参数)", 0.0, 1.0, 0.0, 0.01, help="0→1 逐步画出双曲线上的点")
 st.sidebar.markdown("---")
-distance_diff = st.sidebar.slider("距离差常数 |PF₁ - PF₂| (km)", 0.5, 12.0, 6.0, 0.1)
+distance_diff = st.sidebar.slider("距离差常数 |PF1 - PF2| (km)", 0.5, 12.0, 6.0, 0.1)
 st.sidebar.markdown("---")
 
-# 左焦点（站1，F₁）
+# 左焦点（站1，F1）
 col1, col2 = st.sidebar.columns(2)
 with col1:
-    x1 = st.slider("站1 (F₁) x", -10.0, 10.0, -5.0, 0.5)
+    x1 = st.slider("站1 (F1) x", -10.0, 10.0, -5.0, 0.5)
 with col2:
-    y1 = st.slider("站1 (F₁) y", -10.0, 10.0, 0.0, 0.5)
+    y1 = st.slider("站1 (F1) y", -10.0, 10.0, 0.0, 0.5)
 
-# 右焦点（站2，F₂）
+# 右焦点（站2，F2）
 col1, col2 = st.sidebar.columns(2)
 with col1:
-    x2 = st.slider("站2 (F₂) x", -10.0, 10.0, 5.0, 0.5)
+    x2 = st.slider("站2 (F2) x", -10.0, 10.0, 5.0, 0.5)
 with col2:
-    y2 = st.slider("站2 (F₂) y", -10.0, 10.0, 0.0, 0.5)
+    y2 = st.slider("站2 (F2) y", -10.0, 10.0, 0.0, 0.5)
 
 show_axes = st.sidebar.checkbox("显示实轴和虚轴", value=True)
 
@@ -58,7 +58,7 @@ c = np.linalg.norm(F2 - F1) / 2   # 半焦距
 a = distance_diff / 2             # 半实轴
 valid = a < c and a > 0
 
-# 旋转矩阵：将标准坐标系 x 轴旋转到 F1->F2 方向
+# 旋转矩阵
 direction = (F2 - F1) / (2 * c) if c > 0 else np.array([1, 0])
 rot = np.array([[direction[0], -direction[1]],
                 [direction[1],  direction[0]]])
@@ -70,11 +70,9 @@ if valid:
     b = np.sqrt(c**2 - a**2)
     t_max = 3.0
     t_vals = np.linspace(-t_max, t_max, 400)
-    # 右支 (x = a*cosh(t), y = b*sinh(t))
     x_right = a * np.cosh(t_vals)
     y_right = b * np.sinh(t_vals)
     right_branch = std_to_world(np.vstack((x_right, y_right)).T)
-    # 左支 (x = -a*cosh(t), y = b*sinh(t))
     x_left = -a * np.cosh(t_vals)
     y_left = b * np.sinh(t_vals)
     left_branch = std_to_world(np.vstack((x_left, y_left)).T)
@@ -84,7 +82,6 @@ if valid:
     right_part = right_branch[:idx]
     left_part = left_branch[:idx]
     
-    # 动点 P 位于右支（t为正）
     if progress > 0:
         t_curr = t_vals[idx-1] if idx>0 else t_vals[0]
         p_std = np.array([a * np.cosh(t_curr), b * np.sinh(t_curr)])
@@ -100,7 +97,7 @@ else:
     right_branch = left_branch = right_part = left_part = None
     P = None
 
-# ------------------- 动态坐标轴范围 -------------------
+# 动态坐标轴范围
 all_x = [x1, x2]
 all_y = [y1, y2]
 if valid:
@@ -131,29 +128,27 @@ ax.set_ylabel("y (km)")
 ax.grid(True, alpha=0.3)
 ax.set_aspect('equal')
 
-# 1. 焦点标注：左焦点站1 F₁，右焦点站2 F₂
+# 焦点（蓝色圆点），标注使用普通字符串，无LaTeX
 ax.plot(F1[0], F1[1], 'bo', markersize=10)
 ax.plot(F2[0], F2[1], 'bo', markersize=10)
-ax.text(F1[0] - 1.5, F1[1] - 1.5, "站1 F₁", color='blue', fontsize=11, ha='center', weight='bold',
-        bbox=dict(boxstyle='round,pad=0.2', facecolor='white', edgecolor='none', alpha=0.8))
-ax.text(F2[0] + 1.5, F2[1] - 1.5, "站2 F₂", color='blue', fontsize=11, ha='center', weight='bold',
-        bbox=dict(boxstyle='round,pad=0.2', facecolor='white', edgecolor='none', alpha=0.8))
+# 左焦点标注（透明底框，无白色背景）
+ax.text(F1[0] - 1.5, F1[1] - 1.5, "站1 F1", color='blue', fontsize=11, ha='center', weight='bold')
+# 右焦点标注（透明底框）
+ax.text(F2[0] + 1.5, F2[1] - 1.5, "站2 F2", color='blue', fontsize=11, ha='center', weight='bold')
 
 if valid:
-    # 2. 双曲线：左支红色虚线，右支红色实线
+    # 双曲线：左支红色虚线，右支红色实线
     if len(left_part) > 0:
         ax.plot(left_part[:,0], left_part[:,1], 'r--', linewidth=2, label='双曲线 (左支, 虚线)')
     if len(right_part) > 0:
         ax.plot(right_part[:,0], right_part[:,1], 'r-', linewidth=2, label='双曲线 (右支, 实线)')
     
-    # 未绘制部分（灰色虚线）
     if progress < 1.0:
         if len(left_branch) > 0:
             ax.plot(left_branch[:,0], left_branch[:,1], 'gray', linewidth=1, alpha=0.3, linestyle='--')
         if len(right_branch) > 0:
             ax.plot(right_branch[:,0], right_branch[:,1], 'gray', linewidth=1, alpha=0.3, linestyle='--')
     
-    # 实轴和虚轴
     if show_axes:
         v_right_std = np.array([a, 0])
         v_left_std = np.array([-a, 0])
@@ -168,28 +163,27 @@ if valid:
         ax.plot(v_left[0], v_left[1], 'ko', markersize=4)
         ax.plot(center[0], center[1], 'k+', markersize=8, mew=1.5)
     
-    # 动点 P（绿色，标注“P目标”）
+    # 动点 P（绿色），标注“P目标”
     if P is not None:
         ax.plot(P[0], P[1], 'go', markersize=10, label='P目标')
         ax.text(P[0] + 1.5, P[1] + 1.5, "P目标", color='green', fontsize=12, weight='bold',
                 bbox=dict(boxstyle='round,pad=0.2', facecolor='white', edgecolor='none', alpha=0.9))
         ax.plot([P[0], F1[0]], [P[1], F1[1]], 'g--', linewidth=1.5, alpha=0.8)
         ax.plot([P[0], F2[0]], [P[1], F2[1]], 'g--', linewidth=1.5, alpha=0.8)
-        ax.text(P[0], P[1] - 1.2, f"|PF₁-PF₂| = {actual_diff:.2f} km", color='green', fontsize=9,
+        ax.text(P[0], P[1] - 1.2, f"|PF1-PF2| = {actual_diff:.2f} km", color='green', fontsize=9,
                 ha='center', bbox=dict(boxstyle='round', facecolor='white', alpha=0.7))
     
-    # 参数信息框
+    # 参数信息框：放在左侧，与右侧图例对称，使用白色半透明圆角框
     info_text = f"距离差常数 = {distance_diff:.2f} km\n半实轴 a = {a:.2f}\n半焦距 c = {c:.2f}\n半虚轴 b = {b:.2f}"
-    ax.text(0.05, 0.95, info_text, transform=ax.transAxes, fontsize=9,
-            verticalalignment='top', bbox=dict(boxstyle='round', facecolor='wheat', alpha=0.8))
+    ax.text(0.02, 0.5, info_text, transform=ax.transAxes, fontsize=9,
+            verticalalignment='center', bbox=dict(boxstyle='round', facecolor='white', alpha=0.7))
 else:
     ax.text(0.1, 0.5, "参数不合理：距离差 ≥ 两焦点距离，无法形成双曲线", transform=ax.transAxes, color='red')
 
-# 图例放在右侧中部，避免压到双曲线
-ax.legend(loc='center right', fontsize=10)
+# 图例放在右侧中部，同样白色半透明圆角框（默认）
+ax.legend(loc='center right', fontsize=10, framealpha=0.7)
 st.pyplot(fig, use_container_width=True)
 
-# ------------------- 教学说明 -------------------
 with st.expander("📖 双曲线几何定义与 TDOA 原理衔接（点击展开）"):
     st.markdown(r"""
     - **双曲线定义**：平面内到两个定点（焦点）的距离之差的绝对值为常数（$2a$，且 $2a < |F_1F_2|$）的点的轨迹。  
