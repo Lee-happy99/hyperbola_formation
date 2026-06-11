@@ -100,9 +100,14 @@ else:
     left_branch = right_branch = left_part = right_part = None
     P = None
 
-# 动态坐标轴范围
+# ------------------- 动态坐标轴范围（包含所有图形元素和文字位置） -------------------
 all_x = [x1, x2]
 all_y = [y1, y2]
+# 添加焦点文字的位置
+all_x.append(x1 - 2.0)
+all_y.append(y1 - 1.8)
+all_x.append(x2 + 2.0)
+all_y.append(y2 - 1.8)
 if valid:
     if len(left_branch) > 0:
         all_x.extend(left_branch[:,0])
@@ -113,7 +118,11 @@ if valid:
 if P is not None:
     all_x.append(P[0])
     all_y.append(P[1])
-margin = 2.0
+    # 添加动点文字的位置
+    all_x.append(P[0] - 1.5)
+    all_y.append(P[1] + 1.5)
+# 添加信息框和图例位置（它们使用相对坐标，不影响数据范围，忽略）
+margin = 2.5
 if all_x:
     x_min, x_max = np.min(all_x), np.max(all_x)
     y_min, y_max = np.min(all_y), np.max(all_y)
@@ -123,7 +132,7 @@ else:
     xlim, ylim = (-12, 12), (-10, 10)
 
 # ------------------- 绘图 -------------------
-fig, ax = plt.subplots(figsize=(8, 7))
+fig, ax = plt.subplots(figsize=(9, 8))  # 稍微增大尺寸，避免滚动
 ax.set_xlim(xlim)
 ax.set_ylim(ylim)
 ax.set_xlabel("x (km)")
@@ -131,7 +140,7 @@ ax.set_ylabel("y (km)")
 ax.grid(True, alpha=0.3)
 ax.set_aspect('equal')
 
-# 焦点（蓝色圆点，尺寸减小为5，文字偏移增大）
+# 焦点（蓝色圆点，统一 markersize=3）
 ax.plot(F1[0], F1[1], 'bo', markersize=3)
 ax.plot(F2[0], F2[1], 'bo', markersize=3)
 ax.text(F1[0] - 2.0, F1[1] - 1.8, "站1 F1", color='blue', fontsize=11, ha='center', weight='bold')
@@ -162,18 +171,18 @@ if valid:
         ax.plot([end1[0], end2[0]], [end1[1], end2[1]], 'k--', linewidth=1.2, alpha=0.7, label='虚轴')
         ax.plot(v_right[0], v_right[1], 'ko', markersize=3)
         ax.plot(v_left[0], v_left[1], 'ko', markersize=3)
-        ax.plot(center[0], center[1], 'k+', markersize=3, mew=1.5)
+        ax.plot(center[0], center[1], 'k+', markersize=5, mew=1.5)
     
-    # 动点 P
+    # 动点 P（绿色，markersize=3）
     if P is not None:
         ax.plot(P[0], P[1], 'go', markersize=3, label='P目标')
         ax.text(P[0] - 1.5, P[1] + 1.5, "P目标", color='green', fontsize=12, weight='bold',
                 bbox=dict(boxstyle='round,pad=0.2', facecolor='white', edgecolor='none', alpha=0.9))
         ax.plot([P[0], F1[0]], [P[1], F1[1]], 'g--', linewidth=1.5, alpha=0.8)
         ax.plot([P[0], F2[0]], [P[1], F2[1]], 'g--', linewidth=1.5, alpha=0.8)
-        """ax.text(P[0], P[1] - 1.2, f"|PF1-PF2| = {actual_diff:.2f} km", color='green', fontsize=9,
-              ha='center', bbox=dict(boxstyle='round', facecolor='white', alpha=0.7))
-    """
+        # 注释掉距离差数值显示
+        # ax.text(P[0], P[1] - 1.2, f"|PF1-PF2| = {actual_diff:.2f} km", ...)
+    
     # 参数信息框
     info_text = f"距离差常数 = {distance_diff:.2f} km\n半实轴 a = {a:.2f}\n半焦距 c = {c:.2f}\n半虚轴 b = {b:.2f}"
     ax.text(0.02, 0.5, info_text, transform=ax.transAxes, fontsize=8,
@@ -182,6 +191,8 @@ else:
     ax.text(0.1, 0.5, "参数不合理：距离差 ≥ 两焦点距离，无法形成双曲线", transform=ax.transAxes, color='red')
 
 ax.legend(loc='center right', fontsize=8, framealpha=0.7, handlelength=2, handletextpad=0.5)
+# 自动调整布局，防止边距过大
+plt.tight_layout()
 st.pyplot(fig, use_container_width=True)
 
 with st.expander("📖 双曲线几何定义与 TDOA 原理衔接（点击展开）"):
